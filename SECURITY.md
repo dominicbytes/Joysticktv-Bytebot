@@ -8,5 +8,5 @@ Joysticktv-Bytebot stores sensitive configuration under the current Windows user
 
 ## Reporting a problem
 
-Because this repository is private, report security problems through a private repository issue or contact Dominic Bytes through [dominicbytes.carrd.co](https://dominicbytes.carrd.co/). Revoke compromised bot credentials and OAuth tokens through Joystick.TV immediately.
+Because this repository is private, report security problems through a private repository issue. Revoke compromised bot credentials and OAuth tokens through Joystick.TV immediately.
 
