@@ -1,0 +1,15 @@
+using JoystickTV.Bot;
+
+public class CPHInline
+{
+    public bool Execute() { return true; }
+    public bool Initialize() { JoystickPlugin.Initialize(CPH); return true; }
+    public bool Configure() { return JoystickPlugin.Configure(CPH, args); }
+    public bool Authorize() { return JoystickPlugin.Authorize(CPH); }
+    public bool Start() { return JoystickPlugin.Start(CPH); }
+    public bool Stop() { return JoystickPlugin.Stop(CPH); }
+    public bool Reconnect() { return JoystickPlugin.Reconnect(CPH); }
+    public bool Status() { return JoystickPlugin.Status(CPH); }
+    public bool SendMessage() { return JoystickPlugin.SendMessage(CPH, args); }
+    public bool Test() { return JoystickPlugin.Test(CPH); }
+}
