@@ -1,8 +1,8 @@
 # Joysticktv-Bytebot
 
-Joysticktv-Bytebot is a Streamer.bot integration for Joystick.TV OAuth, GatewayChannel events, chat commands, and outbound messages. Joystick.TV chat is intentionally excluded from the combined-chat surface.
+Joysticktv-Bytebot is a Streamer.bot integration for Joystick.TV OAuth, GatewayChannel events, chat commands, and outbound messages. It does not place JoystickTV into the combined chat.
 
-> Status: private `0.1.0` preview for Streamer.bot 1.0.4 on Windows with .NET Framework 4.8.1.
+> Status: `0.1.0` preview for Streamer.bot 1.0.4 on Windows with .NET Framework 4.8.1.
 
 ## Features
 
@@ -31,6 +31,10 @@ Build instructions are in [docs/BUILDING.md](docs/BUILDING.md). Event names and 
 ## License
 
 MIT License. See [LICENSE](LICENSE).
+
+## Notes
+
+I vibe coded this with GPT 5.6 Sol. I have tested it on my own streams and it works. Use at your own risk.
 
 ## About Dominic Bytes
 
