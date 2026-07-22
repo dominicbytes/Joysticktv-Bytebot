@@ -75,7 +75,7 @@ Joysticktv-Bytebot derives the Basic authorization value internally from the Cli
 
 12. Run `[JoystickTV.Bot] Start`.
 13. Run `[JoystickTV.Bot] Status` and confirm the log reports `Configured=True`, `Authorized=True`, `Running=True`, and `Connected=True`.
-14. Run `[JoystickTV.Bot] Test` to emit a synthetic tip event.
+14. Run `[JoystickTV.Bot] Test` to emit synthetic chat and tip events.
 
 The import initializes custom triggers when Streamer.bot starts. It does not automatically open OAuth or start a connection.
 
@@ -92,7 +92,11 @@ The field can normally remain blank during initial configuration. After the plug
 3. Confirm the corresponding `bridge.joystick.*` custom trigger runs in Streamer.bot.
 4. After an incoming event provides the Channel ID, test `[JoystickTV.Bot] Send Message` with a `message` argument.
 
-Joystick.TV chat is processed for commands and diagnostics but is never forwarded to the combined-chat overlay.
+Joystick.TV chat is processed for commands and diagnostics and is also available to the packaged local combined-chat overlay. The overlay is optional and does not need to be configured for event triggers or Send Message to work.
+
+## Set up combined chat
+
+The release ZIP includes a `combined-chat` directory for displaying Twitch, YouTube, Kick, and Joystick.TV together. Follow [the combined-chat guide](COMBINED-CHAT.md) after the plugin is connected.
 
 ## Troubleshooting
 

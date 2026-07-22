@@ -37,8 +37,11 @@ public static class JoystickParser
         fields["messageId"] = Text(message["messageId"]);
         fields["channelId"] = Text(message["channelId"]);
         fields["userName"] = Text(author["username"]);
-        fields["displayName"] = First(author, "displayNameWithFlair", "displayName", "username");
+        fields["displayName"] = First(author, "displayName", "username", "displayNameWithFlair");
         fields["message"] = Text(message["text"]);
+        fields["userColor"] = Text(author["usernameColor"]);
+        fields["badgesJson"] = ChatBadges(author).ToString(Newtonsoft.Json.Formatting.None);
+        fields["emotesJson"] = JsonSanitizer.SanitizeFragment(message["emotesUsed"] ?? new JArray());
         fields["command"] = Text(message["botCommand"]);
         fields["commandArg"] = Text(message["botCommandArg"]);
         fields["botCommand"] = fields["command"];
@@ -48,6 +51,15 @@ public static class JoystickParser
         fields["isSubscriber"] = Bool(author["isSubscriber"]);
         fields["createdAt"] = Text(message["createdAt"]);
         return new PlatformEvent(JoystickEventNames.ChatMessage, fields);
+    }
+
+    private static JArray ChatBadges(JObject author)
+    {
+        var badges = new JArray();
+        if (Bool(author["isStreamer"])) badges.Add("streamer");
+        if (Bool(author["isModerator"])) badges.Add("moderator");
+        if (Bool(author["isSubscriber"])) badges.Add("subscriber");
+        return badges;
     }
 
     private static PlatformEvent ParsePresence(JObject message)

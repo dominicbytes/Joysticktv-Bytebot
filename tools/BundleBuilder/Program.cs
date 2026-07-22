@@ -5,6 +5,7 @@ using System.Text.Json;
 
 var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
 var dist = Path.Combine(root, "dist");
+var version = args.Length > 0 ? args[0] : "0.2.0";
 
 BuildPackage(new Package(
     "JoystickTV.Bot",
@@ -28,7 +29,10 @@ void BuildPackage(Package package)
         File.Copy(source, Path.Combine(dllDirectory, dll), true);
     }
 
+    CopyDirectory(Path.Combine(root, "src", "JoystickTV.Bot", "combined-chat"), Path.Combine(packageDirectory, "combined-chat"));
+
     File.Copy(Path.Combine(root, "docs", "INSTALLATION.md"), Path.Combine(packageDirectory, "README.md"), true);
+    File.Copy(Path.Combine(root, "docs", "COMBINED-CHAT.md"), Path.Combine(packageDirectory, "COMBINED-CHAT.md"), true);
     File.Copy(Path.Combine(root, "LICENSE"), Path.Combine(packageDirectory, "LICENSE"), true);
 
     var hostCode = File.ReadAllText(package.HostSource, Encoding.UTF8);
@@ -42,7 +46,7 @@ void BuildPackage(Package package)
 
     var bundle = new
     {
-        meta = new { name = package.Name, author = "Dominic Bytes", version = "0.1.0", description = package.Description, autoRunAction = (string?)null, minimumVersion = (string?)null },
+        meta = new { name = package.Name, author = "Dominic Bytes", version, description = package.Description, autoRunAction = (string?)null, minimumVersion = (string?)null },
         data = new { actions, queues = Array.Empty<object>(), commands = Array.Empty<object>(), websocketServers = Array.Empty<object>(), websocketClients = Array.Empty<object>(), timers = Array.Empty<object>() },
         version = 23,
         exportedFrom = "1.0.4",
@@ -146,6 +150,19 @@ string StableGuid(string value)
 {
     var hash = MD5.HashData(Encoding.UTF8.GetBytes(value));
     return new Guid(hash).ToString();
+}
+
+void CopyDirectory(string source, string destination)
+{
+    Directory.CreateDirectory(destination);
+    foreach (var file in Directory.GetFiles(source))
+    {
+        File.Copy(file, Path.Combine(destination, Path.GetFileName(file)), true);
+    }
+    foreach (var directory in Directory.GetDirectories(source))
+    {
+        CopyDirectory(directory, Path.Combine(destination, Path.GetFileName(directory)));
+    }
 }
 
 sealed record Package(string Name, string Description, string HostSource, string[] Methods, string[] Dlls);

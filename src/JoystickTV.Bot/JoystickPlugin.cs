@@ -138,6 +138,16 @@ public static class JoystickPlugin
 
     public static bool Test(IInlineInvokeProxy proxy)
     {
+        proxy.TriggerCodeEvent(JoystickEventNames.ChatMessage, new Dictionary<string, object>
+        {
+            ["platform"] = "joystick", ["eventType"] = "chat.message", ["messageId"] = "test",
+            ["channelId"] = "test", ["userName"] = "JoystickBotTest", ["displayName"] = "JoystickBotTest",
+            ["message"] = "JoystickTV.Bot combined-chat test", ["userColor"] = "#20c7c7",
+            ["badgesJson"] = "[\"streamer\"]", ["emotesJson"] = "[]", ["command"] = string.Empty,
+            ["commandArg"] = string.Empty, ["botCommand"] = string.Empty, ["botCommandArg"] = string.Empty,
+            ["isStreamer"] = true, ["isModerator"] = false, ["isSubscriber"] = false,
+            ["createdAt"] = DateTimeOffset.UtcNow.ToString("O"), ["rawJson"] = "{\"test\":true}"
+        });
         proxy.TriggerCodeEvent(JoystickEventNames.Tipped, new Dictionary<string, object>
         {
             ["platform"] = "joystick", ["eventType"] = "stream.event", ["streamEventType"] = "Tipped",

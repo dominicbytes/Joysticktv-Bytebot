@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Combined Chat Smoke Test</title>
+  <link rel="stylesheet" href="../src/JoystickTV.Bot/combined-chat/styles.css">
+</head>
+<body>
+  <header><strong>Combined Chat</strong><span id="status" aria-live="polite">Connecting</span></header>
+  <main id="chat" aria-live="polite"></main>
+  <script>
+    class MockWebSocket {
+      constructor() {
+        this.listeners = {};
+        window.setTimeout(() => this.emit("open", {}), 0);
+      }
+
+      addEventListener(name, callback) {
+        (this.listeners[name] ||= []).push(callback);
+      }
+
+      send() {
+        const events = [
+          { event: { source: "Twitch", type: "ChatMessage" }, data: { user: { display: "Twitch Viewer" }, message: { message: "Hello from Twitch" } } },
+          { event: { source: "YouTube", type: "Message" }, data: { displayName: "YouTube Viewer", message: "Hello from YouTube" } },
+          { event: { source: "Kick", type: "ChatMessage" }, data: { userName: "Kick Viewer", message: "Hello from Kick" } },
+          { event: { source: "Custom", type: "CodeEvent" }, data: { eventName: "bridge.joystick.chat_message", args: { displayName: "Joystick Viewer", message: "<img src=x onerror=alert(1)>", userColor: "#20c7c7", badgesJson: "[\"moderator\"]", emotesJson: "[{\"name\":\"wave\",\"url\":\"https://example.test/wave.png\"}]" } } }
+        ];
+        events.forEach((data, index) => window.setTimeout(() => this.emit("message", { data: JSON.stringify(data) }), index + 1));
+      }
+
+      close() {}
+
+      emit(name, event) {
+        (this.listeners[name] || []).forEach(callback => callback(event));
+      }
+    }
+
+    window.WebSocket = MockWebSocket;
+  </script>
+  <script src="../src/JoystickTV.Bot/combined-chat/app.js"></script>
+</body>
+</html>

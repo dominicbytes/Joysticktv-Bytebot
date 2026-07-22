@@ -1,8 +1,8 @@
 # Joysticktv-Bytebot
 
-Joysticktv-Bytebot is a Streamer.bot integration for Joystick.TV OAuth, GatewayChannel events, chat commands, and outbound messages. It does not place JoystickTV into the combined chat.
+Joysticktv-Bytebot is a Streamer.bot integration for Joystick.TV OAuth, GatewayChannel events, chat commands, outbound messages, and a local combined-chat display.
 
-> Status: `0.1.0` preview for Streamer.bot 1.0.4 on Windows with .NET Framework 4.8.1.
+> Status: `0.2.0` preview for Streamer.bot 1.0.4 on Windows with .NET Framework 4.8.1.
 
 ## Features
 
@@ -11,14 +11,15 @@ Joysticktv-Bytebot is a Streamer.bot integration for Joystick.TV OAuth, GatewayC
 - Tips/tokens, follows, subscriptions, gifted subscriptions, wheel spins, drop-ins, and stream status events
 - Joystick chat command fields exposed to Streamer.bot without adding a second command engine
 - Permission-gated Send Message action for replies, links, and Streamer.bot timers
+- Local Twitch, YouTube, Kick, and Joystick.TV combined-chat page for OBS
 - Streamer.bot actions for Configure, Authorize, Start, Stop, Reconnect, Status, Send Message, and Test
 - Generic preservation of unknown stream events with sanitized `rawJson`
 
-This integration does not put Joystick.TV chat into Streamer.bot or Rumble-Bytebot combined chat.
+The original `v0.1.0` release remains available as the personal no-chat edition. Starting with `v0.2.0`, Joystick.TV chat can be displayed through the packaged local overlay.
 
 ## Install
 
-Download `Joysticktv-Bytebot-v0.1.0.zip` from the repository's Releases page and follow [the installation guide](docs/INSTALLATION.md).
+Download `Joysticktv-Bytebot-v0.2.0.zip` from the repository's Releases page and follow [the installation guide](docs/INSTALLATION.md). Combined-chat setup is covered in [the overlay guide](docs/COMBINED-CHAT.md).
 
 ## Security
 
