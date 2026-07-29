@@ -35,7 +35,11 @@ MIT License. See [LICENSE](LICENSE).
 
 ## Notes
 
-I vibe coded this with GPT 5.6 Sol. I have tested it on my own streams and it works. Use at your own risk.
+I vibe coded this with GPT 5.6 Sol. I have tested it on my own streams and it works. Use at your own risk. 
+
+Be aware that Joystick chat content is could violate Twitch, Youtube, and Kick TOS if you include it. It's on you to moderate your chat so you're not banned. 
+
+This was inspired by the KickBot plugin that expanded StreamerBot's abilities to interact with Kick.
 
 ## About Dominic Bytes
 
