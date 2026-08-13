@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.1] - 2026-08-13
+
+- Verified the plugin build and test suite against Streamer.bot 1.0.7.
+- Updated the combined-chat overlay for Streamer.bot's current Twitch EventSub emote payload.
+- Normalized the shared bridge assembly version so installing both Bytebot plugins is order-independent.
+
 ## [0.2.0] - 2026-07-22
 
 - Added a packaged local combined-chat display for Twitch, YouTube, Kick, and Joystick.TV.

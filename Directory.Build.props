@@ -6,7 +6,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Deterministic>true</Deterministic>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>0.2.0</Version>
+    <Version>0.2.1</Version>
     <Authors>Dominic Bytes</Authors>
     <Copyright>Copyright (c) 2026 Dominic Bytes</Copyright>
     <RepositoryUrl>https://github.com/dominicbytes/Joysticktv-Bytebot</RepositoryUrl>

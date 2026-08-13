@@ -4,7 +4,7 @@
 
 - .NET SDK 10.0.301 or a compatible newer patch
 - .NET Framework 4.8.1 targeting pack
-- A local Streamer.bot 1.0.4 directory containing `Newtonsoft.Json.dll` and `Streamer.bot.Plugin.Interface.dll`
+- A local Streamer.bot 1.0.7 directory containing `Newtonsoft.Json.dll` and `Streamer.bot.Plugin.Interface.dll`
 
 The Streamer.bot directory is not redistributed. Supply it to the release script:
 
@@ -14,6 +14,6 @@ The Streamer.bot directory is not redistributed. Supply it to the release script
 
 Use `-DotNetPath` when the SDK is installed outside `PATH` and outside the repository's ignored `.local/dotnet-sdk` directory.
 
-The script restores packages, runs Release tests, builds the import bundle, copies the combined-chat assets, and creates `artifacts/Joysticktv-Bytebot-v0.2.0.zip`.
+The script restores packages, runs Release tests, builds the import bundle, copies the combined-chat assets, and creates `artifacts/Joysticktv-Bytebot-v0.2.1.zip`.
 
 Use `-Version` to build a differently numbered archive. The same value is written into the Streamer.bot import bundle metadata.

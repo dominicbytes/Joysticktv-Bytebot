@@ -21,7 +21,7 @@
 
       send() {
         const events = [
-          { event: { source: "Twitch", type: "ChatMessage" }, data: { user: { display: "Twitch Viewer" }, message: { message: "Hello from Twitch" } } },
+          { event: { source: "Twitch", type: "ChatMessage" }, data: { user: { name: "Twitch Viewer", badges: [{ name: "broadcaster", imageUrl: "https://example.test/badge.png" }] }, text: "Hello from Twitch", emotes: [{ Name: "Kappa", ImageUrl: "https://example.test/kappa.png" }] } },
           { event: { source: "YouTube", type: "Message" }, data: { displayName: "YouTube Viewer", message: "Hello from YouTube" } },
           { event: { source: "Kick", type: "ChatMessage" }, data: { userName: "Kick Viewer", message: "Hello from Kick" } },
           { event: { source: "Custom", type: "CodeEvent" }, data: { eventName: "bridge.joystick.chat_message", args: { displayName: "Joystick Viewer", message: "<img src=x onerror=alert(1)>", userColor: "#20c7c7", badgesJson: "[\"moderator\"]", emotesJson: "[{\"name\":\"wave\",\"url\":\"https://example.test/wave.png\"}]" } } }

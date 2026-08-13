@@ -49,7 +49,7 @@ void BuildPackage(Package package)
         meta = new { name = package.Name, author = "Dominic Bytes", version, description = package.Description, autoRunAction = (string?)null, minimumVersion = (string?)null },
         data = new { actions, queues = Array.Empty<object>(), commands = Array.Empty<object>(), websocketServers = Array.Empty<object>(), websocketClients = Array.Empty<object>(), timers = Array.Empty<object>() },
         version = 23,
-        exportedFrom = "1.0.4",
+        exportedFrom = "1.0.7",
         minimumVersion = "1.0.0-alpha.1"
     };
 

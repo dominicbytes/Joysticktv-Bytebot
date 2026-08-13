@@ -2,7 +2,7 @@
 
 Joysticktv-Bytebot is a Streamer.bot integration for Joystick.TV OAuth, GatewayChannel events, chat commands, outbound messages, and a local combined-chat display.
 
-> Status: `0.2.0` preview for Streamer.bot 1.0.4 on Windows with .NET Framework 4.8.1.
+> Status: `0.2.1` preview, tested with Streamer.bot 1.0.7 on Windows and .NET Framework 4.8.1.
 
 ## Features
 
@@ -19,7 +19,7 @@ The original `v0.1.0` release remains available as the personal no-chat edition.
 
 ## Install
 
-Download `Joysticktv-Bytebot-v0.2.0.zip` from the repository's Releases page and follow [the installation guide](docs/INSTALLATION.md). Combined-chat setup is covered in [the overlay guide](docs/COMBINED-CHAT.md).
+Download `Joysticktv-Bytebot-v0.2.1.zip` from the repository's Releases page and follow [the installation guide](docs/INSTALLATION.md). Combined-chat setup is covered in [the overlay guide](docs/COMBINED-CHAT.md).
 
 ## Security
 

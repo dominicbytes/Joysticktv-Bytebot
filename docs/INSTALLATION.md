@@ -3,7 +3,7 @@
 ## Requirements
 
 - Windows
-- Streamer.bot 1.0.4
+- Streamer.bot 1.0.7
 - .NET Framework 4.8.1
 - A Joystick.TV streamer account
 
