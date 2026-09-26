@@ -1,43 +1,33 @@
-# Combined Chat
+# Shared combined chat — September 10 update
 
-The packaged static page combines Streamer.bot's Twitch, YouTube, and Kick chat events with `bridge.joystick.chat_message` events from Joysticktv-Bytebot. It does not contact Joystick.TV directly and never receives the OAuth client secret or tokens.
+One identical `combined-chat` folder is bundled with both plugins. Keep one active folder; every OBS dock/source connects to the same Streamer.bot WebSocket endpoint. HTTP and local-file displays are supported. No Node server is required for normal use.
 
-## Streamer.bot servers
+## Important: this update requires an action import and a DLL update
 
-1. Open **Servers/Clients > WebSocket Server**.
-2. Use address `127.0.0.1`, port `8080`, endpoint `/`, and enable Auto Start.
-3. Start the WebSocket server. Authentication must remain disabled for this display-only client.
-4. Open **Servers/Clients > HTTP Server**.
-5. Use host `127.0.0.1`, port `7474`, and enable Auto Start.
-6. Add mapping path `combined-chat` to the extracted release's `combined-chat` directory.
-7. Start or restart the HTTP server.
+1. Back up the existing plugin DLLs and chat folder, and export your plugin actions.
+2. Close Streamer.bot completely. Copy the package's `dlls` contents into your real Streamer.bot `dlls` folder. If updating both plugins, use both plugin DLLs and only one copy of `StreamerBot.PlatformBridge.Core.dll`.
+3. Replace the entire `combined-chat` folder, including assets.
+4. Start Streamer.bot and import the package's `.sb` bundle. It includes **[Combined Chat] Controls**. Both packages use the same ID for this shared action; only one shared Controls action is needed. Preserve any personal modifications when reviewing the import.
+5. Reload each OBS dock and browser source once to load this version. After that, changing a platform or clicking Clear chat updates all connected displays without refreshing.
 
-Open `http://127.0.0.1:7474/combined-chat/index.html` and confirm the status reads **Connected**.
+Unlike the previous HTML-only update, replacing just HTML is NOT sufficient. If shared controls remain disabled, confirm the new DLL is installed, Streamer.bot was restarted, and **[Combined Chat] Controls** is imported and enabled. The display says **Controls synced across displays** when ready.
 
-Run `[JoystickTV.Bot] Test` and confirm the synthetic `JoystickBotTest` message appears. This verifies the Streamer.bot custom-event and browser-display path without requiring a live Joystick.TV stream.
+## Shared controls
 
-If the WebSocket server uses another local port or endpoint, append it as an encoded `ws` query parameter. For example:
+Use **Platforms** to select any combination of Twitch, YouTube, Kick, Rumble and Joystick.TV. Choices are now saved centrally in the dedicated persisted Streamer.bot global `bytebot.sharedChat.controls.v1`, not independently per browser. Initial defaults enable all except Joystick. Old `platforms=` URL parameters no longer override the shared state.
 
-```text
-http://127.0.0.1:7474/combined-chat/index.html?ws=ws%3A%2F%2F127.0.0.1%3A9000%2F
-```
+**Clear chat** clears the combined display and its saved history across connected views. It does NOT delete messages from Twitch, YouTube, Kick, Rumble or Joystick, nor modify platform moderation or reward state. A view that was disconnected applies the saved clear when it reconnects. New chat continues normally. Clear has no undo; use it intentionally.
 
-## OBS Browser Source
+Each view still caches up to 200 received entries for seven days so history can render immediately; it is not a centralized archive and cannot retrieve messages missed while that view was offline. Platform filtering and clear state are centralized. The display deliberately ignores Rumble stream-status notices, including old cached status rows.
 
-Add a Browser Source using the same local URL. A starting size of 420 by 700 works well. Leave **Shutdown source when not visible** and **Refresh browser when scene becomes active** disabled to preserve the current in-memory rows.
+## Connection and OBS
 
-The same URL can be added as an OBS custom browser dock.
+Default WebSocket: `ws://127.0.0.1:8080/`. Override using `?ws=ws://127.0.0.1:PORT/` on every display. Keep the server restricted to loopback; this page currently supports unauthenticated local connections. Enable the WebSocket server's auto-start setting.
 
-## Display behavior
+For a Browser Source, the local `index.html` can load even while Streamer.bot's HTTP server is off. A custom dock can continue using its existing HTTP URL. Both will synchronize through the same WebSocket connection endpoint, even with different browser storage. The page retries lost WebSocket connections every five seconds.
 
-- Twitch, YouTube, and Kick messages use the structured badge and emote information supplied by Streamer.bot when available.
-- Joystick.TV streamer, moderator, and subscriber roles render as badge labels.
-- Structured Joystick.TV `emotesUsed` assets render only when they provide HTTPS image URLs.
-- Chat names and text are always inserted as text, never trusted HTML.
-- The display keeps the newest 250 messages in memory and reconnects with bounded backoff.
+OBS Browser Sources can use **Interact** to operate the controls. Do not point a production source at the development fake-server URL.
 
-## Security
+Username resolution accepts native structured event users, flat user-name fields, and the Streamer.bot `user`/`userName`/`displayName` action variables used by the Rumble Overlay Event action. A username must be present in the originating event or action arguments; the display does not invent one.
 
-Keep both servers bound to `127.0.0.1`. The overlay does not persist a WebSocket password, so Streamer.bot WebSocket authentication is not supported by this version. Do not expose the HTTP or WebSocket server to a public network interface.
-
-The overlay subscribes only to Twitch chat, YouTube messages, Kick chat, and Streamer.bot custom code events. Custom events are filtered to `bridge.joystick.chat_message`.
+Rumble/Joystick require their respective plugin connections for live data. Rumble public-API limitations still apply. Private whispers and private moderation payloads are not shown.

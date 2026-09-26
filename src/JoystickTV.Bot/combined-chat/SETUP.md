@@ -1,5 +1,5 @@
-# Combined Chat Setup
+# Combined chat setup
 
-See `docs/COMBINED-CHAT.md` in the repository for the complete setup and security notes.
+See [README.md](README.md) for installation, platform toggles, OBS use, connection settings, history, and event coverage.
 
-The packaged page subscribes to Streamer.bot's Twitch, YouTube, and Kick chat events plus `bridge.joystick.chat_message`. It does not connect directly to Joystick.TV and receives no OAuth credentials.
+The display is the same in both plugin packages. Keep one copy; it supports any combination of Twitch, YouTube, Kick, Rumble, and Joystick.TV.
