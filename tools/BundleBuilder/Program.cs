@@ -5,7 +5,7 @@ using System.Text.Json;
 
 var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
 var dist = Path.Combine(root, "dist");
-var version = args.Length > 0 ? args[0] : "0.2.0";
+var version = args.Length > 0 ? args[0] : "0.3.0-local.3";
 
 BuildPackage(new Package(
     "JoystickTV.Bot",
@@ -33,6 +33,7 @@ void BuildPackage(Package package)
 
     File.Copy(Path.Combine(root, "docs", "INSTALLATION.md"), Path.Combine(packageDirectory, "README.md"), true);
     File.Copy(Path.Combine(root, "docs", "COMBINED-CHAT.md"), Path.Combine(packageDirectory, "COMBINED-CHAT.md"), true);
+    File.Copy(Path.Combine(root, "docs", "LOCAL-TESTING.md"), Path.Combine(packageDirectory, "LOCAL-TESTING.md"), true);
     File.Copy(Path.Combine(root, "LICENSE"), Path.Combine(packageDirectory, "LICENSE"), true);
 
     var hostCode = File.ReadAllText(package.HostSource, Encoding.UTF8);

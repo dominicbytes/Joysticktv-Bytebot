@@ -1,129 +1,95 @@
 # Installation
 
-## Requirements
+## Local Test Build
 
-- Windows
-- Streamer.bot 1.0.7
-- .NET Framework 4.8.1
-- A Joystick.TV streamer account
+This 0.3.0-local.3 build is for testing before publication. It adds access-token gateway authentication, rotating refresh tokens, public-client PKCE, and v2 events. Existing bridge.joystick.* trigger names and legacy event parsing are preserved.
 
-## Create a private Joystick.TV bot application
+Requirements: Windows, Streamer.bot 1.0.7, .NET Framework 4.8.1, and a Joystick.TV streamer account.
 
-Joysticktv-Bytebot uses credentials from a bot application owned by the same Joystick.TV account that will run the plugin.
+## Choose Your OAuth Client
+
+Existing installations may keep their own confidential bot application and client secret. New desktop installations can use a public OAuth client with PKCE and no secret.
+
+OAuth client type and marketplace visibility are different settings. A public OAuth client can still be a private bot that only its owner installs.
 
 1. Sign in to [Joystick.TV](https://joystick.tv/).
-2. Open [Bot Applications](https://joystick.tv/applications).
-3. Scroll to the bot application section and select **Create Bot** or **Create Bot Application**.
-4. Keep the application **Private**. Private is the Joystick.TV default and means only the creating account can install it.
-5. Complete the application form using the values below.
+2. Open [Bot Applications](https://joystick.tv/applications) and create or inspect your bot application.
+3. Keep marketplace visibility Private for an owner-only installation.
+4. For a new desktop application, select the public/PKCE OAuth client type if offered.
+5. Register the redirect URI `http://127.0.0.1:17994/`.
+6. Grant the following documented scopes:
 
-| Application field | Value for Joysticktv-Bytebot |
+| Scope | Purpose |
 | --- | --- |
-| Name | `Joysticktv-Bytebot` |
-| Description | `Private Streamer.bot integration for Joystick.TV stream events, chat commands, and messages.` |
-| Redirect URL / Redirect URI | `http://127.0.0.1:17994/` |
-| Visibility | Private |
-| Website | Not required for a private bot |
-| Terms of Service | Not required for a private bot |
-| Privacy Policy | Not required for a private bot |
+| `chat:read` | Receive messages and expose commands to Streamer.bot |
+| `chat:write` | Send public messages |
+| `stream:read` | Receive stream events and read stream state |
 
-The redirect value must match exactly, including `http`, `127.0.0.1`, port `17994`, and the final `/`. The plugin starts a temporary local callback listener at that address while Authorize is running.
+Older application screens may show ReceiveStreamEvents, ReadMessages, SendMessage and ViewUserPresence. The plugin now requests the modern scope string above. If the server refuses a scope, check the application's grant settings before authorizing again.
 
-### Select permissions
+7. Record the Client ID. Confidential clients also have a Client Secret; public clients do not.
+8. Keep credentials out of source files, action definitions, screenshots and logs.
 
-Enable exactly these permissions when creating the application:
+The plugin uses Basic authentication only at confidential OAuth token exchange/refresh. Gateway connections use the OAuth access token for both client types.
 
-| Permission | Why it is required |
-| --- | --- |
-| `ReceiveStreamEvents` | Receives tips, follows, subscriptions, wheel spins, stream start/end, drop-ins, and other stream events. |
-| `ReadMessages` | Receives chat messages so Streamer.bot commands and command arguments can be detected. |
-| `SendMessage` | Allows the Streamer.bot Send Message action to post public chat replies, links, and timed messages. |
-| `ViewUserPresence` | Receives user-entered and user-left events. |
-
-Do not enable `SendWhisper`, `DeleteMessage`, `BlockUser`, `MuteUser`, `ManageStreamerSettings`, or other permissions. Joystick.TV does not allow an application's permissions to be changed after creation. If the permission selection is wrong, delete the application or create a replacement.
-
-6. Create the application.
-7. Copy the generated **OAuth Client ID** and **OAuth Client Secret** to a secure temporary location. Do not place either value in this repository, a Streamer.bot action, a screenshot, or a log.
-
-Joysticktv-Bytebot derives the Basic authorization value internally from the Client ID and Client Secret. Do not manually generate or enter a Basic key.
-
-## Install the plugin
+## Install or Update
 
 1. Close Streamer.bot.
-2. Extract the release ZIP.
-3. Copy `dlls/JoystickTV.Bot.dll` and `dlls/StreamerBot.PlatformBridge.Core.dll` into Streamer.bot's `dlls` directory.
-4. Start Streamer.bot.
-5. Open **Import** and import `JoystickTV.Bot.sb`.
-6. Run `[JoystickTV.Bot] Configure`.
-7. Complete the configuration window using this mapping:
+2. Extract the local test ZIP.
+3. Replace the two files in Streamer.bot's `dlls` directory with `JoystickTV.Bot.dll` and `StreamerBot.PlatformBridge.Core.dll` from the ZIP.
+4. If you use the overlay, install ONLY ONE combined chat. Every Bytebot package ships the same `combined-chat` folder. Replace the contents of your single existing folder only if this package's chat version (2026.10.22) is newer, and never map a second copy. See [COMBINED-CHAT.md](COMBINED-CHAT.md).
+5. Start Streamer.bot and import `JoystickTV.Bot.sb`. Review the import so your custom actions are preserved.
+6. Run `[JoystickTV.Bot] Configure` and check the fields below.
 
-| Plugin field | What to enter |
+| Plugin field | Value |
 | --- | --- |
-| Client ID | The application's **OAuth Client ID**. |
-| Client secret | The application's **OAuth Client Secret**. |
+| Public OAuth client (PKCE, no secret) | Check only for a public OAuth client. Leave unchecked for your existing confidential application. |
+| Client ID | Your application's Client ID |
+| Client secret | Confidential clients: enter the secret, or leave blank to keep the existing one. Public clients: unused. |
 | Redirect URI | `http://127.0.0.1:17994/` |
-| Channel ID | Leave blank initially. This is not the Client ID. |
+| Channel ID | Optional. Leave blank to learn it from an incoming event. |
 
-8. Select **Save**. The client secret is protected with Windows CurrentUser DPAPI before it is written locally.
-9. Run `[JoystickTV.Bot] Authorize`.
-10. A Joystick.TV authorization page opens in the default browser. Sign in with the account that created the private bot, review the four requested permissions, and approve the installation.
-11. Return to Streamer.bot and check the log for:
+7. Save. Configure stops the running connection; changing the client, client type, secret or redirect clears old tokens.
+8. Run `[JoystickTV.Bot] Authorize`, approve the requested scopes in your browser, and wait for the successful authorization log.
+9. Run `[JoystickTV.Bot] Start`.
+10. Run `[JoystickTV.Bot] Status`. Expect Configured=True, Authorized=True, Running=True and Connected=True after the gateway subscription is confirmed.
+11. Run `[JoystickTV.Bot] Test` to verify synthetic chat and tip triggers.
+12. Refresh OBS browser sources/docks after updating overlay files.
 
-```text
-[JoystickTV.Bot] OAuth authorization completed and tokens were protected with CurrentUser DPAPI.
-```
+Authorize stops the gateway while replacing credentials. Run Start again after authorization completes. Import does not automatically start OAuth or connect to Joystick.
 
-12. Run `[JoystickTV.Bot] Start`.
-13. Run `[JoystickTV.Bot] Status` and confirm the log reports `Configured=True`, `Authorized=True`, `Running=True`, and `Connected=True`.
-14. Run `[JoystickTV.Bot] Test` to emit synthetic chat and tip events.
+Tokens and client secrets remain protected with Windows CurrentUser DPAPI. Runtime files are under `%LOCALAPPDATA%\\StreamerBot.PlatformBridge\\JoystickTV.Bot`, outside the plugin folder. Do not put them into a repository.
 
-The import initializes custom triggers when Streamer.bot starts. It does not automatically open OAuth or start a connection.
+## Test the Website Tip-Menu Feature
 
-## Channel ID
+Joystick's October 13, 2026 announcement says a streamer can click their own menu items to generate a tip-style chat notification without spending tokens or advancing tip goals. It does not announce an outbound bot action.
 
-The Channel ID identifies the streamer's Joystick.TV chat channel. It is different from the OAuth Client ID.
+1. Attach a temporary diagnostic action to `bridge.joystick.tipped`.
+2. Click one of your own tip-menu items on Joystick.TV.
+3. Check `tipMenuItem`, `amountTokens`, `userName`, `sourceEventType` and the action firing.
+4. If the tip trigger does not run, check `bridge.joystick.stream_event` and its sanitized `rawJson` for the actual event type.
+5. Also test a real chat command, follow/subscription if available, and Send Message with a `message` argument.
 
-The field can normally remain blank during initial configuration. After the plugin receives a Joystick.TV chat, presence, or stream event, it remembers the `channelId` from that connection for outbound messages. Enter a known Channel ID during Configure only when Send Message must work before the first incoming event. A `channelId` is also included in Joysticktv-Bytebot event arguments and can be inspected inside Streamer.bot.
+The announcement does not specify the gateway payload. Live confirmation is still required; synthetic tests are not proof of real self-tip behavior.
 
-## Verify with live events
+## Refresh and Reconnect
 
-1. Start a Joystick.TV stream or use an available Joystick.TV bot testing mechanism.
-2. Generate an event such as a tip or chat message.
-3. Confirm the corresponding `bridge.joystick.*` custom trigger runs in Streamer.bot.
-4. After an incoming event provides the Channel ID, test `[JoystickTV.Bot] Send Message` with a `message` argument.
+The plugin refreshes an expiring token before reconnecting and persists the newest rotated access/refresh pair. It also reconnects before token expiry during long sessions.
 
-Joystick.TV chat is processed for commands and diagnostics and is also available to the packaged local combined-chat overlay. The overlay is optional and does not need to be configured for event triggers or Send Message to work.
-
-## Set up combined chat
-
-The release ZIP includes a `combined-chat` directory for displaying Twitch, YouTube, Kick, and Joystick.TV together. Follow [the combined-chat guide](COMBINED-CHAT.md) after the plugin is connected.
+Refresh tokens are single-use. After a failed or ambiguous refresh, the plugin discards the potentially consumed pair and requires Authorize again. It does not retry an old refresh token. Run Authorize if an existing installation's tokens have expired.
 
 ## Troubleshooting
 
-### Configure rejects the redirect URI
+- **Public client has no secret:** Check the public OAuth client checkbox; do not generate a Basic key.
+- **Redirect mismatch:** Check the app's registered redirect and the plugin value. Use an HTTP loopback address ending in a slash. The default is `http://127.0.0.1:17994/`.
+- **Authorization times out:** Check that port 17994 is free, and complete browser approval within five minutes.
+- **Subscription rejected:** Check the bot's granted scopes and authorize again.
+- **Token refresh fails:** Run Authorize again, then Start. Avoid restoring or reusing an older refresh token.
+- **No Channel ID:** Receive an event first, configure an observed Channel ID, or pass `channelId` to Send Message.
+- **Controls say disconnected:** Wait for subscription confirmation, then inspect the redacted plugin logs.
 
-Use `http://127.0.0.1:17994/` exactly. `https`, another port, a missing final slash, or a non-local address will be rejected.
+Joystick presence and viewer-count events remain available for actions but are hidden from the combined-chat display. The optional overlay is documented in [COMBINED-CHAT.md](COMBINED-CHAT.md).
 
-### The browser reports a redirect mismatch
+## API Reference
 
-Confirm that the Redirect URL saved in the Joystick.TV application exactly matches the Redirect URI in Joysticktv-Bytebot. If the Joystick.TV application cannot be edited, create a replacement application with the correct value and permissions.
-
-### Authorization opens but never completes
-
-Confirm that no other program is using local TCP port `17994`, then run Authorize again. Complete the browser approval while the authorization action is waiting.
-
-### Status reports `Configured=True` but `Authorized=False`
-
-Run Authorize and approve the private bot installation. If the client secret changed, run Configure again before Authorize.
-
-### Send Message reports that a Channel ID is unavailable
-
-Allow the plugin to receive one Joystick.TV event first, pass a `channelId` argument to the Send Message action, or enter a previously observed Channel ID through Configure.
-
-## Permissions reference
-
-Joystick.TV's current bot application and OAuth behavior is documented in [Joystick.TV Developer Support](https://support.joystick.tv/developer_support/).
-
-## Files created at runtime
-
-Configuration and OAuth tokens are stored outside the plugin folder under the current Windows user's local application data. Sensitive values are protected with CurrentUser DPAPI. Do not move those files into the repository.
+[Joystick.TV Developer Support](https://support.joystick.tv/developer_support/) documents scopes, PKCE, token rotation, gateway v2 and deprecated camelCase action keys.
