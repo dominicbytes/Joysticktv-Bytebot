@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using StreamerBot.PlatformBridge.Core;
 
@@ -9,7 +11,8 @@ public static class JoystickParser
 {
     public static PlatformEvent? ParseCableMessage(string json)
     {
-        var envelope = JObject.Parse(json);
+        using var reader = new JsonTextReader(new StringReader(json)) { DateParseHandling = DateParseHandling.None };
+        var envelope = JObject.Load(reader);
         var type = Text(envelope["type"]);
         if (type == "welcome" || type == "ping" || type == "confirm_subscription" || type == "reject_subscription")
         {
@@ -21,12 +24,84 @@ public static class JoystickParser
             return null;
         }
 
+        if (message.Value<int?>("v") == 2) return ParseV2(message);
+
         switch (Text(message["event"]))
         {
             case "ChatMessage": return ParseChat(message);
             case "UserPresence": return ParsePresence(message);
             case "StreamEvent": return ParseStreamEvent(message);
             default: return null;
+        }
+    }
+
+    private static PlatformEvent ParseV2(JObject message)
+    {
+        var type = Text(message["type"]);
+        var data = message["data"] as JObject ?? new JObject();
+        var normalized = (JObject)data.DeepClone();
+        normalized["channelId"] = message["channel_id"];
+        normalized["createdAt"] = message["occurred_at"];
+        normalized["messageId"] = message["id"];
+        PlatformEvent result;
+        if (type == "new_message" || type == "chat_message")
+        {
+            normalized["text"] = data["text"] ?? message["text"];
+            normalized["emotesUsed"] = data["emotes"] ?? new JArray();
+            var author = normalized["author"] as JObject ?? new JObject();
+            var badges = author["badges"] as JObject ?? new JObject();
+            author["displayName"] = First(author, "nickname", "username");
+            author["usernameColor"] = author["color"];
+            author["isStreamer"] = badges["streamer"] ?? false;
+            author["isModerator"] = badges["mod"] ?? false;
+            author["isSubscriber"] = badges["subscriber"] ?? false;
+            normalized["author"] = author;
+            var text = Text(normalized["text"]);
+            if (text.StartsWith("!", StringComparison.Ordinal))
+            {
+                var end = 1;
+                while (end < text.Length && !char.IsWhiteSpace(text[end])) end++;
+                normalized["botCommand"] = text.Substring(1, end - 1);
+                normalized["botCommandArg"] = text.Substring(end).TrimStart();
+            }
+            result = ParseChat(normalized);
+        }
+        else if (type == "enter_stream" || type == "leave_stream")
+        {
+            normalized["type"] = type;
+            normalized["text"] = data["username"];
+            result = ParsePresence(normalized);
+        }
+        else
+        {
+            normalized["metadata"] = data;
+            normalized["type"] = LegacyStreamType(type);
+            result = ParseStreamEvent(normalized);
+        }
+        result.Arguments["eventId"] = Text(message["id"]);
+        result.Arguments["sourceEventType"] = type;
+        result.Arguments["rawJson"] = JsonSanitizer.SanitizeFragment(message);
+        return result;
+    }
+
+    private static string LegacyStreamType(string type)
+    {
+        switch (type)
+        {
+            case "tipped": return "Tipped";
+            case "wheel_spin_claimed": return "WheelSpinClaimed";
+            case "followed": return "Followed";
+            case "subscribed": return "Subscribed";
+            case "gifted_subscriptions": return "GiftedSubscriptions";
+            case "gifted_subs": return "GiftedSubs";
+            case "stream_dropped_in": return "StreamDroppedIn";
+            case "drop_in": return "DropIn";
+            case "stream_started": return "Started";
+            case "stream_resuming": return "StreamResuming";
+            case "stream_ending": return "StreamEnding";
+            case "stream_ended": return "Ended";
+            case "viewer_count_updated": return "ViewerCountUpdated";
+            default: return type;
         }
     }
 

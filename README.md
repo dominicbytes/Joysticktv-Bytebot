@@ -2,16 +2,16 @@
 
 Joysticktv-Bytebot is a Streamer.bot integration for Joystick.TV OAuth, GatewayChannel events, chat commands, outbound messages, and a local combined-chat display.
 
-> Status: `0.2.1` preview, tested with Streamer.bot 1.0.7 on Windows and .NET Framework 4.8.1.
+> Status: `0.3.0-local.3` API compatibility test build. No GitHub release yet; live Joystick testing is pending.
 
 ## Features
 
-- Joystick.TV authorization-code OAuth with state validation
+- Joystick.TV authorization-code OAuth with state validation, public-client PKCE and rotating-token refresh
 - DPAPI protection for client secrets and OAuth tokens
 - Tips/tokens, follows, subscriptions, gifted subscriptions, wheel spins, drop-ins, and stream status events
 - Joystick chat command fields exposed to Streamer.bot without adding a second command engine
 - Permission-gated Send Message action for replies, links, and Streamer.bot timers
-- Local Twitch, YouTube, Kick, and Joystick.TV combined-chat page for OBS
+- Standard Bytebot combined-chat page for OBS (Twitch, YouTube, Kick, Rumble, AltStream, optional Joystick.TV); install only one copy across all Bytebot plugins
 - Streamer.bot actions for Configure, Authorize, Start, Stop, Reconnect, Status, Send Message, and Test
 - Generic preservation of unknown stream events with sanitized `rawJson`
 
@@ -19,7 +19,7 @@ The original `v0.1.0` release remains available as the personal no-chat edition.
 
 ## Install
 
-Download `Joysticktv-Bytebot-v0.2.1.zip` from the repository's Releases page and follow [the installation guide](docs/INSTALLATION.md). Combined-chat setup is covered in [the overlay guide](docs/COMBINED-CHAT.md).
+For this pre-release build, use `artifacts/Joysticktv-Bytebot-v0.3.0-local.3.zip` and follow [the local test checklist](docs/LOCAL-TESTING.md) and [installation guide](docs/INSTALLATION.md). Combined-chat setup is covered in [the overlay guide](docs/COMBINED-CHAT.md).
 
 ## Security
 

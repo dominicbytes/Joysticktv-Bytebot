@@ -14,7 +14,9 @@ public static class JoystickPlugin
     private static readonly object Sync = new object();
     private static readonly string DataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "StreamerBot.PlatformBridge", "JoystickTV.Bot");
     private static readonly JsonFileStore<JoystickConfig> ConfigStore = new JsonFileStore<JoystickConfig>(Path.Combine(DataDirectory, "config.json"));
+    private static readonly JoystickTokenManager Tokens = new JoystickTokenManager(ConfigStore.Load, ConfigStore.Save, new JoystickOAuthClient());
     private static JoystickConnection? connection;
+    private static Task? authorization;
 
     public static void Initialize(IInlineInvokeProxy proxy)
     {
@@ -33,15 +35,21 @@ public static class JoystickPlugin
         var clientSecret = GetString(arguments, "joystickClientSecret");
         var redirectUri = GetString(arguments, "joystickRedirectUri");
         var channelId = GetString(arguments, "joystickChannelId");
+        var publicClient = config.PublicClient;
+        if (arguments.ContainsKey("joystickPublicClient") && !bool.TryParse(GetString(arguments, "joystickPublicClient"), out publicClient))
+        {
+            proxy.LogError("[JoystickTV.Bot] joystickPublicClient must be True or False.");
+            return false;
+        }
 
-        if (string.IsNullOrWhiteSpace(clientId) && !TryShowConfiguration(config, out clientId, out clientSecret, out redirectUri, out channelId))
+        if (string.IsNullOrWhiteSpace(clientId) && !TryShowConfiguration(config, out clientId, out clientSecret, out redirectUri, out channelId, out publicClient))
         {
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(clientId) || (string.IsNullOrWhiteSpace(clientSecret) && string.IsNullOrWhiteSpace(config.ProtectedClientSecret)))
+        if (string.IsNullOrWhiteSpace(clientId) || (!publicClient && string.IsNullOrWhiteSpace(clientSecret) && string.IsNullOrWhiteSpace(config.ProtectedClientSecret)))
         {
-            proxy.LogError("[JoystickTV.Bot] Client ID and client secret are required.");
+            proxy.LogError("[JoystickTV.Bot] Client ID is required; confidential clients also need a client secret.");
             return false;
         }
 
@@ -51,11 +59,16 @@ public static class JoystickPlugin
             return false;
         }
 
-        config.ClientId = clientId.Trim();
-        if (!string.IsNullOrWhiteSpace(clientSecret)) config.SetClientSecret(clientSecret);
-        config.RedirectUri = redirectUri;
-        config.ChannelId = channelId.Trim();
-        ConfigStore.Save(config);
+        try
+        {
+            Stop(proxy);
+            Tokens.Configure(clientId.Trim(), clientSecret, redirectUri, channelId.Trim(), publicClient);
+        }
+        catch (InvalidOperationException exception)
+        {
+            proxy.LogError("[JoystickTV.Bot] Configure failed: " + exception.Message);
+            return false;
+        }
         proxy.LogInfo("[JoystickTV.Bot] Configuration saved. Secrets are protected with CurrentUser DPAPI.");
         return true;
     }
@@ -66,7 +79,7 @@ public static class JoystickPlugin
         try
         {
             config = ConfigStore.Load();
-            if (string.IsNullOrWhiteSpace(config.ClientId) || string.IsNullOrWhiteSpace(config.GetClientSecret())) throw new InvalidOperationException("Configure credentials first.");
+            if (string.IsNullOrWhiteSpace(config.ClientId) || (!config.PublicClient && string.IsNullOrWhiteSpace(config.GetClientSecret()))) throw new InvalidOperationException("Configure credentials first.");
         }
         catch (Exception exception)
         {
@@ -74,19 +87,27 @@ public static class JoystickPlugin
             return false;
         }
 
-        Task.Run(async () =>
+        lock (Sync)
         {
-            try
+            if (authorization?.IsCompleted == false)
             {
-                await new JoystickOAuthClient().AuthorizeAsync(config, CancellationToken.None).ConfigureAwait(false);
-                ConfigStore.Save(config);
-                proxy.LogInfo("[JoystickTV.Bot] OAuth authorization completed and tokens were protected with CurrentUser DPAPI.");
+                proxy.LogInfo("[JoystickTV.Bot] Authorization is already waiting for browser approval.");
+                return false;
             }
-            catch (Exception exception)
+            connection?.Stop();
+            authorization = Task.Run(async () =>
             {
-                proxy.LogError("[JoystickTV.Bot] OAuth authorization failed: " + exception.Message);
-            }
-        });
+                try
+                {
+                    await Tokens.AuthorizeAsync(CancellationToken.None).ConfigureAwait(false);
+                    proxy.LogInfo("[JoystickTV.Bot] OAuth authorization completed and tokens were protected with CurrentUser DPAPI.");
+                }
+                catch (Exception exception)
+                {
+                    proxy.LogError("[JoystickTV.Bot] OAuth authorization failed (" + exception.GetType().Name + "). Check the client setup and run Authorize again.");
+                }
+            });
+        }
         proxy.LogInfo("[JoystickTV.Bot] Opening the Joystick.TV authorization page.");
         return true;
     }
@@ -109,17 +130,19 @@ public static class JoystickPlugin
     {
         var configured = false;
         var authorized = false;
+        DateTimeOffset? expiresAt = null;
         try
         {
             var config = ConfigStore.Load();
-            configured = !string.IsNullOrWhiteSpace(config.ClientId) && !string.IsNullOrWhiteSpace(config.GetClientSecret());
+            configured = !string.IsNullOrWhiteSpace(config.ClientId) && (config.PublicClient || !string.IsNullOrWhiteSpace(config.GetClientSecret()));
             authorized = !string.IsNullOrWhiteSpace(config.GetAccessToken());
+            expiresAt = config.AccessTokenExpiresAt ?? JoystickOAuthClient.JwtExpiresAt(config.GetAccessToken());
         }
         catch { }
         var running = false;
         var connected = false;
         lock (Sync) { running = connection?.IsRunning == true; connected = connection?.IsConnected == true; }
-        proxy.LogInfo($"[JoystickTV.Bot] Configured={configured}; Authorized={authorized}; Running={running}; Connected={connected}; Credentials=<redacted>");
+        proxy.LogInfo($"[JoystickTV.Bot] Configured={configured}; Authorized={authorized}; Running={running}; Connected={connected}; TokenExpiresAt={expiresAt?.ToString("O") ?? "Unknown"}; Credentials=<redacted>");
         return configured && running && connected;
     }
 
@@ -164,7 +187,7 @@ public static class JoystickPlugin
             if (connection == null)
             {
                 var adapter = new StreamerBotAdapter(proxy);
-                connection = new JoystickConnection(adapter, adapter);
+                connection = new JoystickConnection(adapter, adapter, Tokens);
             }
             return connection;
         }
@@ -172,20 +195,24 @@ public static class JoystickPlugin
 
     private static string GetString(IDictionary<string, object> arguments, string key) => arguments.TryGetValue(key, out var value) ? Convert.ToString(value) ?? string.Empty : string.Empty;
 
-    private static bool TryShowConfiguration(JoystickConfig config, out string clientId, out string clientSecret, out string redirectUri, out string channelId)
+    private static bool TryShowConfiguration(JoystickConfig config, out string clientId, out string clientSecret, out string redirectUri, out string channelId, out bool publicClient)
     {
-        using var form = new Form { Text = "JoystickTV.Bot Configuration", Width = 590, Height = 255, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, StartPosition = FormStartPosition.CenterScreen };
-        var clientIdBox = AddField(form, "Client ID", 16, config.ClientId, false);
-        var secretBox = AddField(form, "Client secret", 52, string.Empty, true);
-        var redirectBox = AddField(form, "Redirect URI", 88, config.RedirectUri, false);
-        var channelBox = AddField(form, "Channel ID", 124, config.ChannelId, false);
-        var save = new Button { Left = 388, Top = 166, Width = 82, Text = "Save", DialogResult = DialogResult.OK };
-        var cancel = new Button { Left = 476, Top = 166, Width = 82, Text = "Cancel", DialogResult = DialogResult.Cancel };
-        form.Controls.AddRange(new Control[] { save, cancel });
+        using var form = new Form { Text = "JoystickTV.Bot Configuration", Width = 590, Height = 290, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, StartPosition = FormStartPosition.CenterScreen };
+        var publicBox = new CheckBox { Left = 126, Top = 12, Width = 400, Text = "Public OAuth client (PKCE, no secret)", Checked = config.PublicClient };
+        var clientIdBox = AddField(form, "Client ID", 48, config.ClientId, false);
+        var secretBox = AddField(form, "Client secret", 84, string.Empty, true);
+        secretBox.Enabled = !publicBox.Checked;
+        publicBox.CheckedChanged += (_, __) => secretBox.Enabled = !publicBox.Checked;
+        var redirectBox = AddField(form, "Redirect URI", 120, config.RedirectUri, false);
+        var channelBox = AddField(form, "Channel ID", 156, config.ChannelId, false);
+        var save = new Button { Left = 388, Top = 202, Width = 82, Text = "Save", DialogResult = DialogResult.OK };
+        var cancel = new Button { Left = 476, Top = 202, Width = 82, Text = "Cancel", DialogResult = DialogResult.Cancel };
+        form.Controls.AddRange(new Control[] { publicBox, save, cancel });
         form.AcceptButton = save;
         form.CancelButton = cancel;
         var accepted = form.ShowDialog() == DialogResult.OK;
         clientId = clientIdBox.Text.Trim(); clientSecret = secretBox.Text; redirectUri = redirectBox.Text.Trim(); channelId = channelBox.Text.Trim();
+        publicClient = publicBox.Checked;
         return accepted;
     }
 

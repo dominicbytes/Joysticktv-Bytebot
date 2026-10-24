@@ -2,6 +2,10 @@
 
 Every event includes `platform`, `eventType`, and sanitized event-fragment `rawJson`.
 
+The local 0.3.0 build subscribes to Joystick's v2 gateway envelope and still parses legacy v1 events. Trigger names and normalized argument names remain unchanged. v2 events also include `eventId` and `sourceEventType` (the original snake_case type). `streamEventType` keeps legacy labels such as `Tipped` and `ViewerCountUpdated` for existing actions. `rawJson` contains the sanitized original event.
+
+v2 chat derives `botCommand` and `botCommandArg` from an initial `!command`; routing, cooldowns and execution remain in Streamer.bot.
+
 | Event | Code event | Primary arguments |
 | --- | --- | --- |
 | Chat command/message | `bridge.joystick.chat_message` | `messageId`, `channelId`, `userName`, `displayName`, `message`, `userColor`, `badgesJson`, `emotesJson`, `command`, `commandArg`, role flags, `createdAt` |

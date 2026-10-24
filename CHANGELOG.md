@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.3.0-local.3] - 2026-10-22
+
+- Pre-release test build; no GitHub release. Plugin behavior is unchanged from 0.3.0-local.1.
+- Ships the standard Bytebot combined chat (2026.10.22): AltStream incoming raids appear as event rows and highlighted messages as accented chat rows. Install only one copy.
+
+## [0.3.0-local.2] - 2026-10-15
+
+- Pre-release test build; no GitHub release. Plugin behavior is unchanged from 0.3.0-local.1.
+- Ships the standard Bytebot combined chat (2026.10.15), identical in all three Bytebot packages; install only one copy.
+- Shared Controls accept the AltStream platform filter.
+
+## [0.3.0-local.1] - 2026-10-13
+
+- Pre-release test build; no GitHub release.
+- Added access-token gateway authentication and expiry-aware rotating-token refresh.
+- Added public OAuth client PKCE while preserving confidential-client configuration.
+- Updated OAuth form requests, explicit scopes, v2 events and snake_case gateway actions.
+- Preserved existing trigger names and legacy parsing; added v2 chat command and display metadata.
+- Added API compatibility tests and a live self-tip testing checklist.
+
 ## [0.2.1] - 2026-08-13
 
 - Verified the plugin build and test suite against Streamer.bot 1.0.7.
