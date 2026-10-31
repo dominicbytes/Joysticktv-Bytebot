@@ -14,6 +14,6 @@ The Streamer.bot directory is not redistributed. Supply it to the release script
 
 Use `-DotNetPath` when the SDK is installed outside `PATH` and outside the repository's ignored `.local/dotnet-sdk` directory.
 
-The script restores packages, runs Release tests, builds the import bundle, copies the combined-chat assets, and creates `artifacts/Joysticktv-Bytebot-v0.3.0-local.3.zip`. This version is a pre-release test build with no GitHub release.
+The script restores packages, runs Release tests, builds the import bundle, copies the combined-chat assets, and creates `artifacts/Joysticktv-Bytebot-v0.3.0.zip`.
 
 Use `-Version` to build a differently numbered archive. The same value is written into the Streamer.bot import bundle metadata.

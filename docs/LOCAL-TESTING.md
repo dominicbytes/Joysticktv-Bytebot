@@ -1,12 +1,10 @@
-# Local API Compatibility Test - 0.3.0-local.3
+# Upgrade Checklist - 0.3.0
 
-This is a pre-release test build with no GitHub release. Test Joystick by itself before changing the production stream setup.
+Version 0.3.0 follows the 0.2.1 release. Test Joystick by itself before changing the production stream setup.
 
-## Changes in 0.3.0-local.2 and 0.3.0-local.3
+## Shared Components
 
-`JoystickTV.Bot.dll` behavior is unchanged from 0.3.0-local.1. These builds only add:
-
-- The standard Bytebot combined chat (version 2026.10.22 in local.3; it adds AltStream incoming raids and highlighted messages), identical across the Rumble, Joystick and AltStream packages. Install ONLY ONE combined chat; see [COMBINED-CHAT.md](COMBINED-CHAT.md).
+- The standard Bytebot combined chat (version 2026.10.31), identical across the Rumble, Joystick and AltStream packages. Install ONLY ONE combined chat; see [COMBINED-CHAT.md](COMBINED-CHAT.md).
 - AltStream filter support in the shared `StreamerBot.PlatformBridge.Core.dll` used by **[Combined Chat] Controls**.
 
 ## Changes from 0.2.1
@@ -22,7 +20,7 @@ This is a pre-release test build with no GitHub release. Test Joystick by itself
 
 ## Test Checklist
 
-1. Close Streamer.bot and install the ZIP's DLLs. For the overlay, install ONLY ONE combined chat: replace the contents of your single existing `combined-chat` folder only if it is older than 2026.10.22. Import the bundle after reviewing existing actions.
+1. Close Streamer.bot and install the ZIP's DLLs. For the overlay, install ONLY ONE combined chat: replace the contents of your single existing `combined-chat` folder only if it is older than 2026.10.31. Import the bundle after reviewing existing actions; upgrading from 0.2.1 needs it for **[Combined Chat] Controls**.
 2. Keep the public-client checkbox unchecked for your current confidential application, or check it for a new public/PKCE application.
 3. Configure, Authorize, Start, then Status. Confirm all four status flags are True.
 4. Test a chat message and command. Verify command/argument fields and the overlay.
