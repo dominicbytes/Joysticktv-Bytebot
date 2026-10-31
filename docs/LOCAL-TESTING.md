@@ -17,7 +17,7 @@ This is a pre-release test build with no GitHub release. Test Joystick by itself
 - Tokens expire/rotate and are persisted with CurrentUser DPAPI.
 - Gateway requests v2 events and sends channel_id. Existing trigger names and v1 parsing remain supported.
 - v2 chat commands, color, badges and emotes are normalized.
-- ISO timestamps are preserved. Presence and viewer-count notices stay hidden in chat.
+- ISO timestamps are preserved. Presence, viewer-count and follower-count notices stay hidden in chat.
 - No undocumented outbound tip-menu action was added.
 
 ## Test Checklist
@@ -30,7 +30,7 @@ This is a pre-release test build with no GitHub release. Test Joystick by itself
 6. Send a message using the existing Send Message action.
 7. Stop, Start and Reconnect separately. Confirm one connection and no repeated handlers.
 8. Leave the connection running across access-token expiry. Confirm it reconnects and remains authorized. Public tokens are documented as four hours; confidential tokens as ten days.
-9. Confirm user-entered/left and viewer-count notices stay hidden while ordinary messages, tips and follows display.
+9. Confirm user-entered/left, viewer-count and follower-count notices stay hidden while ordinary messages, tips and follows display.
 
 Do not share config.json, tokens, client secrets, full cable URLs or token endpoint requests. A sanitized event fragment and redacted log are sufficient for parser troubleshooting.
 
