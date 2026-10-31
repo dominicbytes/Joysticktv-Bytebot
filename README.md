@@ -2,7 +2,7 @@
 
 Joysticktv-Bytebot is a Streamer.bot integration for Joystick.TV OAuth, GatewayChannel events, chat commands, outbound messages, and a local combined-chat display.
 
-> Status: `0.3.0-local.3` API compatibility test build. No GitHub release yet; live Joystick testing is pending.
+> Status: `v0.3.0` pre-release.
 
 ## Features
 
@@ -19,7 +19,7 @@ The original `v0.1.0` release remains available as the personal no-chat edition.
 
 ## Install
 
-For this pre-release build, use `artifacts/Joysticktv-Bytebot-v0.3.0-local.3.zip` and follow [the local test checklist](docs/LOCAL-TESTING.md) and [installation guide](docs/INSTALLATION.md). Combined-chat setup is covered in [the overlay guide](docs/COMBINED-CHAT.md).
+Download `Joysticktv-Bytebot-v0.3.0.zip` from the repository's Releases page and follow [the installation guide](docs/INSTALLATION.md) and [the upgrade checklist](docs/LOCAL-TESTING.md). Combined-chat setup is covered in [the overlay guide](docs/COMBINED-CHAT.md).
 
 ## Security
 

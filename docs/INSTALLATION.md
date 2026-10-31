@@ -1,8 +1,8 @@
 # Installation
 
-## Local Test Build
+## Version 0.3.0
 
-This 0.3.0-local.3 build is for testing before publication. It adds access-token gateway authentication, rotating refresh tokens, public-client PKCE, and v2 events. Existing bridge.joystick.* trigger names and legacy event parsing are preserved.
+Version 0.3.0 adds access-token gateway authentication, rotating refresh tokens, public-client PKCE, and v2 events. Existing bridge.joystick.* trigger names and legacy event parsing are preserved.
 
 Requirements: Windows, Streamer.bot 1.0.7, .NET Framework 4.8.1, and a Joystick.TV streamer account.
 
@@ -35,9 +35,9 @@ The plugin uses Basic authentication only at confidential OAuth token exchange/r
 ## Install or Update
 
 1. Close Streamer.bot.
-2. Extract the local test ZIP.
+2. Extract the release ZIP.
 3. Replace the two files in Streamer.bot's `dlls` directory with `JoystickTV.Bot.dll` and `StreamerBot.PlatformBridge.Core.dll` from the ZIP.
-4. If you use the overlay, install ONLY ONE combined chat. Every Bytebot package ships the same `combined-chat` folder. Replace the contents of your single existing folder only if this package's chat version (2026.10.22) is newer, and never map a second copy. See [COMBINED-CHAT.md](COMBINED-CHAT.md).
+4. If you use the overlay, install ONLY ONE combined chat. Every Bytebot package ships the same `combined-chat` folder. Replace the contents of your single existing folder only if this package's chat version (2026.10.31) is newer, and never map a second copy. See [COMBINED-CHAT.md](COMBINED-CHAT.md).
 5. Start Streamer.bot and import `JoystickTV.Bot.sb`. Review the import so your custom actions are preserved.
 6. Run `[JoystickTV.Bot] Configure` and check the fields below.
 

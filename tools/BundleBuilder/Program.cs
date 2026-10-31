@@ -5,7 +5,7 @@ using System.Text.Json;
 
 var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
 var dist = Path.Combine(root, "dist");
-var version = args.Length > 0 ? args[0] : "0.3.0-local.3";
+var version = args.Length > 0 ? args[0] : "0.3.0";
 
 BuildPackage(new Package(
     "JoystickTV.Bot",

@@ -1,7 +1,8 @@
 # Changelog
 
-## [Unreleased]
+## [0.3.0] - 2026-10-31
 
+- First GitHub release since 0.2.1. Includes every 0.3.0-local change below; import `JoystickTV.Bot.sb` when upgrading from 0.2.1.
 - Ships the standard Bytebot combined chat (2026.10.31): only a reader scrolling up pauses auto-scroll, so an OBS Browser Source no longer gets stuck partway up after scene switches. Install only one copy.
 - The combined chat no longer shows Joystick follower-count updates ("Someone: Follower count updated") after each follow.
 
