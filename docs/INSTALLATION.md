@@ -88,7 +88,7 @@ Refresh tokens are single-use. After a failed or ambiguous refresh, the plugin d
 - **No Channel ID:** Receive an event first, configure an observed Channel ID, or pass `channelId` to Send Message.
 - **Controls say disconnected:** Wait for subscription confirmation, then inspect the redacted plugin logs.
 
-Joystick presence and viewer-count events remain available for actions but are hidden from the combined-chat display. The optional overlay is documented in [COMBINED-CHAT.md](COMBINED-CHAT.md).
+Joystick presence, viewer-count and follower-count events remain available for actions but are hidden from the combined-chat display. The optional overlay is documented in [COMBINED-CHAT.md](COMBINED-CHAT.md).
 
 ## API Reference
 
